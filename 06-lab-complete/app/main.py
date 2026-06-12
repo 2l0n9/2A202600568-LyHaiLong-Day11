@@ -31,11 +31,10 @@ import uvicorn
 
 from app.config import settings
 
-from langchain_core.messages import HumanMessage
-from app.graph import create_graph
-
-# Initialize the LangGraph agent
-agent_graph = create_graph()
+import sys
+from pathlib import Path
+sys.path.append(str(Path(__file__).parent / "src"))
+from task10_generation import generate_with_citation
 
 # ─────────────────────────────────────────────────────────
 # Logging — JSON structured
@@ -217,21 +216,22 @@ async def ask_agent(
         "client": str(request.client.host) if request.client else "unknown",
     }))
 
-    # Run LangGraph Agent
-    result = await agent_graph.ainvoke(
-        {"messages": [HumanMessage(content=body.question)]},
-        config={"configurable": {"thread_id": _key[:8]}},
-    )
-
-    answer = ""
-    for msg in reversed(result.get("messages", [])):
-        if hasattr(msg, "content") and msg.content:
-            if not isinstance(msg, HumanMessage):
-                answer = msg.content
-                break
-    
-    if not answer:
-        answer = "I was unable to generate a tax analysis at this time."
+    # Run Day08 RAG Pipeline
+    try:
+        rag_result = generate_with_citation(body.question)
+        answer = rag_result.get("answer", "Xin lỗi, không có câu trả lời.")
+        
+        # Append sources to the answer
+        sources = rag_result.get("sources", [])
+        if sources:
+            answer += "\n\nNguồn tham khảo:\n"
+            for idx, src in enumerate(sources, 1):
+                metadata = src.get("metadata", {})
+                source_name = metadata.get("filename") or metadata.get("document_name") or src.get("source", "Nguồn")
+                answer += f"[{idx}] {source_name}\n"
+    except Exception as e:
+        logger.error(f"RAG Error: {e}")
+        answer = "I was unable to generate an analysis due to an internal error."
 
     output_tokens = len(answer.split()) * 2
     check_and_record_cost(0, output_tokens)
@@ -248,7 +248,7 @@ async def ask_agent(
 def health():
     """Liveness probe. Platform restarts container if this fails."""
     status = "ok"
-    checks = {"llm": "langgraph_agent"}
+    checks = {"llm": "rag_pipeline_weaviate_openai"}
     return {
         "status": status,
         "version": settings.app_version,

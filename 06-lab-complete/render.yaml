@@ -12,7 +12,13 @@ services:
         value: production
       - key: APP_VERSION
         value: "1.0.0"
-      - key: OPENROUTER_API_KEY
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: WEAVIATE_URL
+        sync: false
+      - key: WEAVIATE_API_KEY
+        sync: false
+      - key: JINA_API_KEY
         sync: false
       - key: AGENT_API_KEY
         generateValue: true
