@@ -238,7 +238,7 @@ async def ask_agent(
             answer += "\n\nSources:\n"
             for idx, src in enumerate(sources, 1):
                 metadata = src.get("metadata", {})
-                source_name = metadata.get("filename") or metadata.get("document_name") or src.get("source", "Source")
+                source_name = metadata.get("source") or metadata.get("filename") or metadata.get("document_name") or src.get("source", "Source")
                 answer += f"[{idx}] {source_name}\n"
     except Exception as e:
         logger.error(f"RAG Error: {e}")
