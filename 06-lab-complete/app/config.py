@@ -1,4 +1,4 @@
-"""Production config — 12-Factor: tất cả từ environment variables."""
+"""Production config - 12-Factor: tat ca tu environment variables."""
 import os
 import logging
 from dataclasses import dataclass, field

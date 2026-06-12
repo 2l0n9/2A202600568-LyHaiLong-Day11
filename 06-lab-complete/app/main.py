@@ -1,18 +1,18 @@
 """
-Production AI Agent — Kết hợp tất cả Day 12 concepts
+Production AI Agent - Ket hop tat ca Day 12 concepts
 
 Checklist:
-  ✅ Config từ environment (12-factor)
-  ✅ Structured JSON logging
-  ✅ API Key authentication
-  ✅ Rate limiting
-  ✅ Cost guard
-  ✅ Input validation (Pydantic)
-  ✅ Health check + Readiness probe
-  ✅ Graceful shutdown
-  ✅ Security headers
-  ✅ CORS
-  ✅ Error handling
+  [x] Config tu environment (12-factor)
+  [x] Structured JSON logging
+  [x] API Key authentication
+  [x] Rate limiting
+  [x] Cost guard
+  [x] Input validation (Pydantic)
+  [x] Health check + Readiness probe
+  [x] Graceful shutdown
+  [x] Security headers
+  [x] CORS
+  [x] Error handling
 """
 import os
 import time
@@ -219,15 +219,15 @@ async def ask_agent(
     # Run Day08 RAG Pipeline
     try:
         rag_result = generate_with_citation(body.question)
-        answer = rag_result.get("answer", "Xin lỗi, không có câu trả lời.")
+        answer = rag_result.get("answer", "Sorry, no answer found.")
         
         # Append sources to the answer
         sources = rag_result.get("sources", [])
         if sources:
-            answer += "\n\nNguồn tham khảo:\n"
+            answer += "\n\nSources:\n"
             for idx, src in enumerate(sources, 1):
                 metadata = src.get("metadata", {})
-                source_name = metadata.get("filename") or metadata.get("document_name") or src.get("source", "Nguồn")
+                source_name = metadata.get("filename") or metadata.get("document_name") or src.get("source", "Source")
                 answer += f"[{idx}] {source_name}\n"
     except Exception as e:
         logger.error(f"RAG Error: {e}")

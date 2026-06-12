@@ -78,7 +78,7 @@ def run_checks():
     print("\n🌐 API Endpoints (code check)")
     main_py = os.path.join(base, "app", "main.py")
     if os.path.exists(main_py):
-        content = open(main_py).read()
+        content = open(main_py, encoding='utf-8').read()
         results.append(check("/health endpoint defined",
                              '"/health"' in content or "'/health'" in content))
         results.append(check("/ready endpoint defined",
@@ -98,7 +98,7 @@ def run_checks():
     print("\n🐳 Docker")
     dockerfile = os.path.join(base, "Dockerfile")
     if os.path.exists(dockerfile):
-        content = open(dockerfile).read()
+        content = open(dockerfile, encoding='utf-8').read()
         results.append(check("Multi-stage build",
                              "AS builder" in content or "AS runtime" in content))
         results.append(check("Non-root user",
@@ -110,7 +110,7 @@ def run_checks():
 
     dockerignore = os.path.join(base, ".dockerignore")
     if os.path.exists(dockerignore):
-        content = open(dockerignore).read()
+        content = open(dockerignore, encoding='utf-8').read()
         results.append(check(".dockerignore covers .env",
                              ".env" in content))
         results.append(check(".dockerignore covers __pycache__",
