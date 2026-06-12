@@ -31,8 +31,11 @@ import uvicorn
 
 from app.config import settings
 
-# Mock LLM (thay bằng OpenAI/Anthropic khi có API key)
-from utils.mock_llm import ask as llm_ask
+from langchain_core.messages import HumanMessage
+from app.graph import create_graph
+
+# Initialize the LangGraph agent
+agent_graph = create_graph()
 
 # ─────────────────────────────────────────────────────────
 # Logging — JSON structured
@@ -214,7 +217,21 @@ async def ask_agent(
         "client": str(request.client.host) if request.client else "unknown",
     }))
 
-    answer = llm_ask(body.question)
+    # Run LangGraph Agent
+    result = await agent_graph.ainvoke(
+        {"messages": [HumanMessage(content=body.question)]},
+        config={"configurable": {"thread_id": _key[:8]}},
+    )
+
+    answer = ""
+    for msg in reversed(result.get("messages", [])):
+        if hasattr(msg, "content") and msg.content:
+            if not isinstance(msg, HumanMessage):
+                answer = msg.content
+                break
+    
+    if not answer:
+        answer = "I was unable to generate a tax analysis at this time."
 
     output_tokens = len(answer.split()) * 2
     check_and_record_cost(0, output_tokens)
@@ -231,7 +248,7 @@ async def ask_agent(
 def health():
     """Liveness probe. Platform restarts container if this fails."""
     status = "ok"
-    checks = {"llm": "mock" if not settings.openai_api_key else "openai"}
+    checks = {"llm": "langgraph_agent"}
     return {
         "status": status,
         "version": settings.app_version,
