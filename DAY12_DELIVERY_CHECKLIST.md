@@ -1,8 +1,8 @@
 #  Delivery Checklist — Day 12 Lab Submission
 
-> **Student Name:** _________________________  
-> **Student ID:** _________________________  
-> **Date:** _________________________
+> **Student Name:** Ly Hai Long  
+> **Student ID:** 2A202600568  
+> **Date:** 13/4/2026
 
 ---
 
