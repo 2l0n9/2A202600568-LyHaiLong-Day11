@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production AI Agent Dashboard</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Dashboard -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-icon"><i class="fa-solid fa-robot"></i></div>
+                <div class="logo-text">
+                    <h1>Agent Panel</h1>
+                    <span class="badge" id="env-badge">production</span>
+                </div>
+            </div>
+
+            <!-- Server Status -->
+            <div class="section-card">
+                <h2 class="section-title"><i class="fa-solid fa-server"></i> Server Status</h2>
+                <div class="status-item">
+                    <span class="status-label">Liveness (Health)</span>
+                    <span class="status-indicator status-unknown" id="health-status">
+                        <span class="dot"></span> <span class="text">Checking...</span>
+                    </span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Readiness</span>
+                    <span class="status-indicator status-unknown" id="ready-status">
+                        <span class="dot"></span> <span class="text">Checking...</span>
+                    </span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Uptime</span>
+                    <span class="status-val" id="uptime-val">-</span>
+                </div>
+            </div>
+
+            <!-- Authentication Setup -->
+            <div class="section-card">
+                <h2 class="section-title"><i class="fa-solid fa-key"></i> Credentials</h2>
+                <p class="section-desc">Enter your agent key to access protected endpoints and send chat requests.</p>
+                <div class="input-group">
+                    <div class="input-with-icon">
+                        <i class="fa-solid fa-lock input-icon"></i>
+                        <input type="password" id="api-key-input" placeholder="X-API-Key" autocomplete="off">
+                        <button class="icon-btn" id="toggle-key-visibility" title="Show Key">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                    <button class="btn btn-primary btn-block" id="save-key-btn">
+                        <i class="fa-solid fa-check"></i> Save Key
+                    </button>
+                </div>
+            </div>
+
+            <!-- Protected Metrics -->
+            <div class="section-card metrics-card hidden" id="metrics-card">
+                <h2 class="section-title"><i class="fa-solid fa-chart-line"></i> Real-time Metrics</h2>
+                <div class="metrics-grid">
+                    <div class="metric-box">
+                        <span class="metric-num" id="total-requests">0</span>
+                        <span class="metric-lbl">Requests</span>
+                    </div>
+                    <div class="metric-box">
+                        <span class="metric-num error-text" id="error-count">0</span>
+                        <span class="metric-lbl">Errors</span>
+                    </div>
+                </div>
+                
+                <div class="budget-section">
+                    <div class="budget-header">
+                        <span class="budget-lbl">Daily Budget Spent</span>
+                        <span class="budget-val" id="budget-ratio">$0.00 / $5.00</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="budget-progress" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <p>Version <span id="app-version">1.0.0</span></p>
+                <p>© 2026 Ly Hai Long • Day 12</p>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-area">
+            <header class="chat-header">
+                <div class="chat-header-info">
+                    <h2>Legal & News AI Agent</h2>
+                    <p><i class="fa-solid fa-shield-halved"></i> Secured with RAG Pipeline + Guardrails</p>
+                </div>
+                <button class="btn icon-only-btn" id="clear-chat-btn" title="Clear Conversation">
+                    <i class="fa-solid fa-trash-can"></i>
+                </button>
+            </header>
+
+            <!-- Chat Message History -->
+            <div class="chat-messages" id="chat-messages">
+                <div class="msg-bubble assistant-msg">
+                    <div class="msg-avatar"><i class="fa-solid fa-robot"></i></div>
+                    <div class="msg-content-wrapper">
+                        <div class="msg-content">
+                            <p>Xin chào! Tôi là Trợ lý AI của bạn được xây dựng trên Weaviate và mô hình ngôn ngữ lớn.</p>
+                            <p>Tôi có thể giúp bạn giải đáp các thông tin pháp luật về phòng chống ma túy tại Việt Nam hoặc tin tức liên quan từ các nguồn báo chí chính thống.</p>
+                            <div class="suggested-queries">
+                                <button class="suggest-btn">Hình phạt cho tội tàng trữ trái phép chất ma tuý?</button>
+                                <button class="suggest-btn">Quy trình cai nghiện bắt buộc theo Luật 2021?</button>
+                                <button class="suggest-btn">Những nghệ sĩ nào bị bắt vì ma túy năm 2024?</button>
+                            </div>
+                        </div>
+                        <span class="msg-time">System Startup</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Controls -->
+            <div class="chat-input-container">
+                <div class="warning-banner hidden" id="key-warning">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <span>Please enter your API Key in the sidebar credentials to unlock chat endpoints.</span>
+                </div>
+                <div class="chat-input-row">
+                    <textarea id="chat-textarea" placeholder="Nhập câu hỏi của bạn tại đây... (Shift + Enter để xuống dòng)" rows="1" maxlength="2000"></textarea>
+                    <button class="btn btn-send" id="send-msg-btn" disabled>
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- JavaScript file -->
+    <script src="/static/app.js"></script>
+</body>
+</html>

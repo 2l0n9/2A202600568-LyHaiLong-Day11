@@ -26,6 +26,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Security, Depends, Request, Response
 from fastapi.security.api_key import APIKeyHeader
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 import uvicorn
 
@@ -137,6 +139,8 @@ app.add_middleware(
     allow_headers=["Authorization", "Content-Type", "X-API-Key"],
 )
 
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
+
 @app.middleware("http")
 async def request_middleware(request: Request, call_next):
     global _request_count, _error_count
@@ -181,6 +185,11 @@ class AskResponse(BaseModel):
 
 @app.get("/", tags=["Info"])
 def root():
+    return FileResponse("app/static/index.html")
+
+
+@app.get("/info", tags=["Info"])
+def info():
     return {
         "app": settings.app_name,
         "version": settings.app_version,
@@ -189,6 +198,7 @@ def root():
             "ask": "POST /ask (requires X-API-Key)",
             "health": "GET /health",
             "ready": "GET /ready",
+            "info": "GET /info",
         },
     }
 
